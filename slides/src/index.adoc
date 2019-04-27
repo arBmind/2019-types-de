@@ -1,0 +1,1211 @@
+= Type driven Development: mit [.yellow]#C++#
+:author: Andreas Reischuck
+:twitter: @arBmind
+:!avatar: andreas.png
+:!organization: HicknHack Software GmbH
+:!sectids:
+:imagesdir: images
+:icons: font
+:use-link-attrs:
+:title-separator: :
+:codedir: code
+:data-uri:
+
+*ADC++ 2019*
+
+[.cue]
+****
+Willkommen
+
+Zielstellung:
+* Wir spielen / hacken?
+* Verstehen - Was ist das?
+* Weniger: Wofür brauch ich das?
+
+Für jeden hoffentlich etwas dabei
+****
+
+[.subtitle]
+== Was ist ein Typ?
+
+[.cue]
+****
+Es kommt darauf an, wen man fragt.
+****
+
+== Was ist ein Typ?: …für den Prozessor
+
+[%build]
+* Interpretation von Bits
+* Recheneinheiten
+* Alignment
+
+[.cue]
+****
+* Hardware / Interpretation von Bits
+* Float vs Int vs SSE
+****
+
+== Was ist ein Typ?: …für den Compiler
+
+[%build]
+* Separierung
+* Anzahl Bytes
+* Lifecycle
+
+[.cue]
+****
+* Schutz vor Fehlinterpretation
+****
+
+== Was ist ein Typ?: …für den Entwickler
+
+[%build]
+* Ordnung
+* Semantik
+* Funktionen
+
+[.cue]
+****
+* Hilfe zur Strukturierung
+* APIs / Verwaltungs
+****
+
+== !
+
+[.canvas]
+image::Zirkelstein.jpg[]
+
+[.cue]
+****
+* Damit haben wir das geklärt.
+* Jetzt festhalten, es kommt C++ Code
+****
+
+
+[.subtitle]
+== Starke Typen
+
+Strong Types
+
+[.cue]
+****
+* Bevor wir auf typ-getriebene Entwicklung eingehen…
+****
+
+[.source]
+== !
+
+[.build]
+--
+[source%nested, cpp, subs=quotes,macros]
+----
+using Distance = double; // Alias
+// nest++
+auto d = Distance{3} + 2; // [.green]##Ok##: just double
+// nest--
+
+// nest++
+using Velocity = Strong&lt;double, struct VelocityTag>;
+// nest--
+// nest++
+auto v = Velocity{3} + 2; // [.red]##Error##: no operator
+// nest--
+----
+--
+
+[.cue]
+****
+* Alias bringt keine Sicherheit
+* Die struct *Tag macht den Typen einzigartig.
+
+Wie könnte das Strong Template aussehen?
+****
+
+[.source]
+== !
+
+[.build]
+--
+[source%nested, cpp, subs=quotes,macros]
+----
+template&lt;class V, class... /\*Tags*/>
+struct Strong {
+    // nest++
+    [.token.class-name]##V## v{};
+    // nest--
+};
+----
+--
+
+[.cue]
+****
+* Die Signatur: Basistyp und beliebig viele Tags
+* Einfachste Implementierung
+
+Ihr könnt da noch viel hinzufügen… für uns reicht das hier.
+
+Mehr…
+****
+
+== !
+
+image::BarneyDellar_StrongTypes_CppOnSea.png[role="center", width="1280"]
+
+link:https://www.youtube.com/watch?v=fWcnp7Bulc8[Strong Types in C++ - Barney Dellar [C++ on Sea 2019]]
+
+[.cue]
+****
+Es gibt viele gute Vorträge darüber.
+
+Ein gutes Beispiel ist auch <chronos>.
+
+Ziel ist es angenehme "Reguläre Typen" zu bauen.
+****
+
+== !
+
+image::VictorCiura_RegularTypes_Accu2019.png[role="center", width="1280"]
+
+link:https://www.youtube.com/watch?v=OMhzlcBl9Hc[Regular Types and Why Do I Care ? - Victor Ciura [ACCU 2019]]
+
+[.cue]
+****
+Dazu gibt es ebenfalls gutes Material.
+
+Für uns reicht erstmal der einfache Strong Type.
+****
+
+[.subtitle]
+== Data-Oriented Design
+
+[.cue]
+****
+Typgetriebene Entwicklung eine weiterentwicklung von Daten getriebenem Design.
+****
+
+== Wer hat davon gehört / gelesen?
+
+== Wer hat es ausprobiert?
+
+[.cue]
+****
+Danke!
+****
+
+== !
+
+image::MikeActon_Data-Oriented_Design_CcpCon2014.png[role="center", width="1280"]
+
+link:https://www.youtube.com/watch?v=rX0ItVEVjHc[CppCon 2014: Mike Acton "Data-Oriented Design and C++"]
+
+[.cue]
+****
+Mike Acton, Engine Director vor Insomniac Games hat das Thema auf der CppCon 2014 eindrucksvoll vorgeführt.
+
+Seitdem gab es eine Menge Vorträge.
+
+Was ist da der Unterschied?
+* zB. zu Objektorientiertem Design
+****
+
+== Objektorientiert vs. Datengetrieben
+
+[%build.compare]
+* [.left]##Entity (== Klasse)##
+  [.right]##Daten (== Strukturen)## 
+* [.left]##Memberfunktionen##
+  [.right]##Freie Funktionen##
+* [.left]##Monolith##
+  [.right]##Microservices##
+
+[.cue]
+****
+Es gibt sicher komplexe wissenschaftliche Abhandlungen
+
+Meine diletantische Zusammenfassung hier:
+* Der Fokus auf Klassen vs. Strukturen
+
+Services die mit Daten-Protokollen verbunden sind.
+
+Anders die Herausforderung:
+****
+
+== Herausforderungen
+
+[%build]
+* Protokolle (Daten)
+* Services (Berechnung)
+* Repository (Datenhaltung)
+
+[.cue]
+****
+* Datenaustausch zwischen
+* Freien Funktionen (Services)
+* Die Berechnen / Vereinen / Transformieren
+* Irgendwie speichern wir was notwendig ist
+
+* Alles muss zueinander passen
+* Da liegt ein Schema dahinter
+
+Das nennen wir hier:
+****
+
+[.subtitle]
+== Datenschema
+
+[.cue]
+****
+Hmm, das gibts doch schon?
+****
+
+== Beispiele
+
+[%build]
+* XML / JSON-Schema
+* Tabellenschema (Datenbanken)
+* Objektbeziehungsmodell (ERM)
+
+[.cue]
+****
+Das Problem ist analog?
+* Schema treibt Protokoll / Speicherformat
+* Austausch zwischen Softwarekomponenten
+****
+
+== !
+
+image::Geburtstag.jpg[role="center", width="1920"]
+
+[.cue]
+****
+Wir haben alle Begriffe
+* Strong Types
+* Protokolle, Services und Repositories
+* Datenschema
+
+Bevor wir losessen, brauchen wir noch Motivation.
+Nicht wirklich ein Anwendungsbeispiel, sodern eine ganze Klasse:
+****
+
+[.subtitle]
+== Baum
+
+== !
+
+image::Baum.jpg[role="center", width="1920"]
+
+[.cue]
+****
+Ich hab so ein Ding vorm Fenster stehen.
+****
+
+== !
+
+image::Bäume.jpg[role="center", width="1920"]
+
+[.cue]
+****
+Aber die gibts in Massen.
+
+Nicht nur im Wald…
+****
+
+== Bäume überall
+
+[%build]
+* Dateisystem
+* GUI / Scenegraph / HTML
+* Parse-Tree (AST)
+* [language-cpp]#`std::map`#
+* …
+
+[.cue]
+****
+* Wir ordnen alles in Bäumen
+* Alle GUIs sind Bäume (2D, 3D, HTML)
+* Selbst wenn Ich keinen Baum programmiert - Der Compiler
+* Für Optimierungen in der STL
+
+Trotzdem dun wir so als ob die Erde ein Scheibe wäre.
+****
+
+== Adhoc-Bäume
+
+[%build]
+* kein Tree in STL (trotz <filesystem>)
+* QObject
+* Boost: PropertyTree, Graph, …
+* Expression Templates
+* => [.red]##Zu viele Varianten##
+
+
+[.cue]
+****
+… warum ist das so?
+****
+
+== Anpassungen
+
+[%build]
+* Management der Invarianten
+* Speicherung (Knoten, Blätter, Kanten)
+* Teilbäume erlaubt
+* schnelle Iterationen
+* erlaubte Änderungen
+
+[.cue]
+****
+Invarianten:
+* keine doppelten IDs
+* Nur bestimmte Knoten auf Ebenen
+* Tiefenlimit
+Speicherung
+* Sortierung (automatisch/vom Nutzer)
+****
+
+== Kombinatorische Explosion
+
+[.canvas]
+image::mortonus_explosion.jpg[]
+
+[.cue]
+****
+Wie lösen wir das?
+* Auf Umwegen - mit Schemas
+****
+
+[.subtitle]
+== Schema mit C++
+
+[.cue]
+****
+kommen wir zurück zu richtigem Code.
+
+Wie beschreiben wir ein Datenschema mit C++?
+****
+
+[.source]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// schema primitives:
+// nest++
+template<class...> struct AllOf {}; // struct
+// nest--
+// nest++
+template<class...> struct OneOf {}; // variant
+// nest--
+// nest++
+template<class...> struct SomeOf {};
+// nest--
+// nest++
+template<class Id, class> struct EntitySet {};
+// nest--
+// nest++
+template<class Id, class> struct IdMap {};
+// nest--
+// nest++
+// …
+// nest--
+// nest++
+template<class Id, class Node, class Leaf>
+struct OrderedTree {};
+// nest--
+----
+--
+
+[.cue]
+****
+Wir bauen uns abstrakte Dummy-Typen.
+
+Ein Baum ist jetzt genau das, was wir in unserer Anwendung darunter verstehen.
+
+Ok, jetzt können wir die benutzen.
+****
+
+[.source]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// example usage:
+// nest++
+enum class Anrede { Neutral, Herr, Frau };
+// nest--
+// nest++
+using Vorname = Strong<string, struct VornameTag>;
+// nest--
+// nest++
+using Nachname = Strong<string, struct NachnameTag>;
+// nest--
+// nest++
+using PersonData = AllOf<Anrede, Vorname, Nachname>;
+// nest--
+
+// nest++
+using PersonId = Strong<int, struct PersonIdTag>;
+// nest--
+// nest++
+using Persons = EntitySet<PersonId, PersonData>;
+// nest--
+----
+--
+
+[.cue]
+****
+Wir wollen Personendaten verwalten.
+
+Statt Datenfeldern haben wir Typen.
+Statt fixer Container haben wir abstrakte Konzepte.
+****
+
+== Typ getriebene [.green]#Code Generierung#
+
+[.canvas]
+image::grandValleyCattleDrive.jpg[]
+
+== Ziele
+
+[%build]
+* Speicherung
+* Befehle
+* Repository
+* Netzwerk-Protokolle
+* Verarbeitung
+
+[.cue]
+****
+* Einfache Speicherung für den Transport im Speicher.
+* Befehle zum Verwalten der Daten
+* Repositories zum längerfristigen Speichern und Nachschlagen
+* Protokolle zum Ableich zwischen Rechnern
+* komplexe Verarbeitung der Daten
+****
+
+== Pattern
+
+[%build]
+* Je abstraktem Typ
+* Eine Interpretation
+* Rekursion für alle Untertypen
+
+[.cue]
+****
+… mit der Rekursion bekommen wir ein Problem.
+
+Wir arbeiten mit Templates. Die Reihenfolge ist wichtig…
+****
+
+== Reihenfolge-Problem
+
+""
+…, unqualified name lookup takes place when the template definition is examined.
+""
+link:https://en.cppreference.com/w/cpp/language/unqualified_lookup#Template_definition[cppreference.com]
+
+[.cue]
+****
+Anders als man es intuitiv vermuten würde.
+Werden nicht beim Instantiierten des Templates die Symbole gesucht.
+
+Sondern: Dort wo wir das Template definieren, werden die Namen evaluiert.
+
+Zum Glück gibt es ADL…
+****
+
+== ADL rettet uns!
+
+""
+(in other words, adding a new function declaration after template definition does not make it visible except via ADL)
+""
+link:https://en.cppreference.com/w/cpp/language/unqualified_lookup#Template_definition[cppreference.com]
+
+[.cue]
+****
+So lange unsere Argumente in einem Namensraum sind, finden wir Funktionen auch in diesen Namensräumen.
+
+Puhh!
+
+Schauen wir uns das mal für die einfache Speicherung an…
+****
+
+== Einfache Speicherung
+
+[.cue]
+****
+Die Daten müssen nur abgespeichert werden, damit sie nicht verloren gehen.
+
+Wir müssen kein Protokoll einhalten - alles steht uns zur Verfügung.
+
+Zunächst brauchen wir etwas Boilerplate für das ADL.
+****
+
+[.source.s54x13]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// Storage ADL Boilerplate
+// nest++
+namespace storage {
+
+// nest++
+template<class T> struct Wrap {};
+// nest--
+
+// nest++
+template<class T> auto toStorage(T);
+// nest--
+
+// nest++
+template<class T>
+using ToStorage = decltype(toStorage(Wrap<T>{}));
+// nest--
+
+} // namespace storage
+// nest--
+----
+--
+
+[.cue]
+****
+Außen ein Namespace.
+
+* Wrap sorgt dafür dass alles in unserem Namespace ist.
+* toStorage bildet die Typ-Transformation ab.
+* ToStorage erleichtert uns die Auswertung.
+
+Uns interessiert nur, was für ein Rückgabetyp zurück kommt.
+Jeden Typ verpacken wir in unser Wrap.
+
+Jetzt brauchen wir nur die Funktion weiter zu speziailisieren.
+****
+
+[.source.s67x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// nest++
+template<class... Ts>
+auto toStorage(Wrap<AllOf<Ts...>>)
+// nest++
+    -> std::tuple<ToStorage<Ts>...>;
+// nest--
+// nest--
+
+// nest++
+template<class... Ts>
+auto toStorage(Wrap<OneOf<Ts...>>)
+// nest++
+    -> std::variant<ToStorage<Ts>...>;
+// nest--
+// nest--
+
+// nest++
+template<class Id, class Data>
+auto toStorage(Wrap<EntitySet<Id, Data>>)
+// nest++
+    -> std::vector<std::tuple<Id, ToStorage<Data>>>;
+// nest--
+// nest--
+----
+--
+
+[.cue]
+****
+AllOf sagt alle Typen sollen genau einmal gespeichert sein.
+Das macht ein std::tuple ganz gut.
+Für jeden Typen bilden wir auch wieder den Storage Typen.
+
+OneOf sagt es ist genau ein Typ vorhanden.
+Das bildet ein std::variant sehr gut ab.
+
+EntitySet ist etwas spezieller.
+Für jedes Entity speichern wir die Id und die Daten.
+Da es beliebig viele geben kann und wir nur speichern wollen, passt ein Vector sehr gut.
+
+Alles klar?
+
+Wir rufen ToStorage auch für unsere Primitiven auf.
+Dafür brauchen wir auch noch eine Spezialisierung.
+****
+
+[.source.s67x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// storage for values
+// nest++
+template<class T>
+constexpr bool isValue() {
+// nest++
+    if constexpr (std::is_class_v<T>) 
+        return !std::is_empty_v<T>;
+// nest--
+// nest++
+    else
+        return std::is_enum_v<T>;
+// nest--
+}
+// nest--
+
+// nest++
+template<class T>
+auto toStorage(Wrap<T>)
+    -> std::enable_if_t<isValue<T>(), T>;
+// nest--
+----
+--
+
+[.cue]
+****
+Zunächst müssen wir die Values von Abstrakten Typen trennen.
+Wenn es eine Klasse oder Struct ist, darf es nicht leer sein.
+Ansonsten haben wir nur "rohe" enums erlaubt.
+Alles andere sollte in Strong-Typen verpackt sein.
+
+ToStorage ist der Typ selbst, für alle Value Typen.
+Mit C++ brauchen wir etwas SFINAE.
+
+Ok. Prinzip klar?
+
+Dann schauen wir mal, was beim Baum passiert.
+****
+
+[.source.s67x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// Storage for OrderedTree
+// nest++
+template<class Id>
+using ParentId = StrongAddTag<Id, struct ParentIdTag>;
+// nest--
+
+// nest++
+template<class Id, class Node, class Leaf>
+using TreeNode = std::tuple<
+// nest++
+    Id, ParentId<Id>,
+// nest--
+// nest++
+    std::variant<ToStorage<Node>, ToStorage<Leaf>>
+// nest--
+    >;
+// nest--
+
+// nest++
+template<class Id, class Node, class Leaf>
+auto toStorage(Wrap<OrderedTree<Id, Node, Leaf>>)
+    -> std::vector<TreeNode<Id, Node, Leaf>>;
+// nest--
+----
+--
+
+[.cue]
+****
+Beim Baum haben wir wieder Id und Daten.
+Wir müssen nun aber auch die Hierarchie abbilden.
+Für die Speicherung ist es am einfachsten, wenn jeder Knoten, seinen Parent kennt.
+
+Zunächst sollten wir ParentId und Id unterscheiden.
+
+Einfach oder?
+****
+
+== Befehle
+
+[.cue]
+****
+Nachdem das für Storage so gut funktioniert, machen wir das für Befehle auch.
+
+Basierend auf dem Schema bauen wir Datenstrukturen für alle Befehle auf.
+
+Den ADL Boilerplate erspare ich euch, der ist immer gleich.
+****
+
+[.source]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+template<class Id, class Data>
+auto toCommand(Wrap<EntitySet<Id, Data>>)
+// nest++
+    -> std::variant<
+      // nest++
+        ToStorage<Data>,                 // Create
+      // nest--
+      // nest++
+        std::tuple<Id, ToCommand<Data>>, // Update
+      // nest--
+      // nest++
+        Id>;                             // Delete
+      // nest--
+// nest--
+----
+--
+
+[.cue]
+****
+Fangen wir gleich mit dem EnititySet an.
+
+Was hätten wir da für Befehle?
+
+Create, Update und Delete.
+
+Nur Update ist Rekursiv!
+****
+
+[.source.s77x19]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// Commands for OrderedTree
+// nest++
+template<class Id, class Node, class Leaf>
+using TreeCreate = std::tuple<
+// nest--
+// nest++
+    ParentId<Id>, BeforeId<Id>, ToStorage<OrderedTree<Id, Node, Leaf>>>;
+// nest--
+
+// nest++
+template<class Id, class Node, class Leaf>
+using TreeUpdate = std::tuple<
+// nest--
+// nest++
+    Id, std::variant<ToCommand<Node>, ToCommand<Leaf>>>;
+// nest--
+
+// nest++
+template<class Id, class Node, class Leaf>
+auto toCommand(Wrap<OrderedTree<Id, Node, Leaf>>)
+// nest++
+    -> std::variant<
+      // nest++
+        TreeCreate<Id, Node, Leaf>,                 // Create
+      // nest--
+      // nest++
+        TreeUpdate<Id, Node, Leaf>,                 // Update
+      // nest--
+      // nest++
+        std::tuple<Id, ParentId<Id>, BeforeId<Id>>, // Move
+      // nest--
+      // nest++
+        Id>;                                        // Delete
+      // nest--
+// nest--
+// nest--
+----
+--
+
+[.cue]
+****
+Beim Baum ist wieder alles analog… nur etwas aufwendiger.
+Daher hab ich die Befehle mal als Typen rausgezogen.
+
+Update verarbeitet nur einen Knoten, damit es einfacher wird.
+
+Zusätzlich können wir noch Knoten verschieben.
+
+Wie Ihr seht kann man immer lokal arbeiten.
+****
+
+== Repository
+
+[.cue]
+****
+Den gleichen Pattern können wir nun auch nutzen um Repositories aus dem Schema abzuleiten.
+****
+
+[.source.s67x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+template<class Id, class Data>
+auto toRepository(Wrap<EntitySet<Id, Data>>)
+// nest++
+    -> std::map<Id, ToRepository<Data>>;
+// nest--
+----
+--
+
+[.cue]
+****
+Das reicht aus.
+
+Zum besseren Testen kann es hilfreich sein, eigene Klassen zu erstellen…
+****
+
+[.source.s67x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+template<class Id, class Data>
+class EntityRepository {
+    std::map<Id, ToRepository<Data>> m;
+
+public:
+    // nest++
+    auto operator[] (Id) -> ToRepository<Data>&;
+    // nest--
+    // nest++
+    void create(const ToStorage<Data>&);
+    // nest--
+    // nest++
+    void remove(Id);
+    // nest--
+};
+
+// nest++
+template<class Id, class Data>
+auto toRepository(Wrap<EntitySet<Id, Data>>)
+// nest--
+// nest++
+    -> EntityRepository<Id, Data>;
+// nest--
+----
+--
+
+[.cue]
+****
+So, sehen wir direkt welche Operationen angedacht sind.
+****
+
+== Befehlsverarbeitung
+
+[.cue]
+****
+Nach Commands und Repositories geht es nun daran die Befehle auch wirklich zu verarbeiten.
+****
+
+== !
+
+Command ∘ Repository -> Updated Repository
+
+[.cue]
+****
+Die Repositories implementieren alles grundlegende,
+aber die Steuerung fehlt noch.
+
+Wir generieren hier keine Typen sondern Funktionen.
+Damit wir den Pattern nicht zu start abwandeln müssen, nutzen wir Lambdas…
+****
+
+[.source.s77x19]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// Processor Boilerplate
+namespace processor {
+
+// nest++
+template<class T> struct Wrap {};
+// nest--
+
+// nest++
+template<class T> auto toCommandProcessor(T); // Lambda(cmd, repo&)
+// nest--
+
+// nest++
+template<class T>
+constexpr auto to_command_processor = toCommandProcessor(Wrap<T>{});
+// nest--
+
+} // namespace processor
+----
+--
+
+[.cue]
+****
+Wir haben weiterhin das Wrap für ADL.
+
+toCommandProcessor liefert ein Lambda.
+Das Lambda erwartet ein Command und eine Referenz auf das passende Repository.
+
+Da wir Lambdas aus dem Typ nicht instantiieren können, nutzen wir eine Compile-Time-Konstante.
+
+Für ein EntitySet sieht dass dann wie folgt aus…
+****
+
+[.source.s77x19]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+template<class Id, class Data>
+constexpr auto toCommandProcessor(Wrap<EntitySet<Id, Data>>) {
+    // nest++
+    return [](const ToCommand<EntitySet<Id, Data>>& cmd, 
+              ToRepository<EntitySet<Id, Data>>& repo) {
+        // nest++
+        oneVisit(cmd,
+            // nest++
+            [&repo](const ToStorage<Data>& storage) {
+                repo.create(storage);
+            },
+            // nest--
+            // nest++
+            [&repo](const std::tuple<Id, ToCommand<Data>>& update) {
+                auto [id, dataCmd] = update;
+                to_command_processor<Data>(dataCmd, repo[id]);
+            },
+            // nest--
+            // nest++
+            [&repo](Id id) {
+                repo.remove(id);
+            });
+            // nest--
+        // nest--
+    };
+    // nest--
+}
+----
+--
+
+[.cue]
+****
+Wir erzeugen, das besagte Lambda mit der Signatur.
+Abhängig vom konkreten Befehl…
+rufen wir die passende Funktion im Repository auf.
+****
+
+== Zwischenstand
+
+[%build]
+* [.green]#✔# [language-cpp]#`ToStorage<T>`#
+* [.green]#✔# [language-cpp]#`ToCommand<T>`#
+* [.green]#✔# [language-cpp]#`ToRepository<T>`#
+* [.green]#✔# [language-cpp]#`to_command_processor<T>`#
+
+== Was noch?
+
+[%build]
+* Netzwerk-Protokolle
+* Berechnungen
+* Gui
+
+
+[.cue]
+****
+Protokolle - da kommt nichts neues
+****
+
+== Berechnungen
+
+[.source.s77x19]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// nest++
+using Ansprache = Strong<std::string, struct AnspracheTag>;
+// nest--
+
+// nest++
+auto toComputedValues(PersonData) -> AllOf<Ansprache>;
+// nest--
+
+// nest++
+void compute(const ToStorage<PersonData>& s, Ansprache& o) {
+    auto anrede = std::get<Anrede>(s);
+    auto& nachname = std::get<Nachname>(s);
+    // nest++
+    auto out = std::stringstream{};
+    switch (anrede) {
+    case Anrede::Neutral: out << "Hallo " << nachname.v; break;
+    case Anrede::Herr: out << "Sehr geehrter Herr " << nachname.v; break;
+    case Anrede::Frau: out << "Sehr geehrte Frau " << nachname.v; break;
+    }
+    o.v = out.str();
+    // nest--
+}
+// nest--
+----
+--
+
+[.source.s77x19]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+template<class T>
+auto toComputedValues(T) -> AllOf<>; // Fallback
+
+template<class T>
+using ToComputedValues = decltype(toComputedValues(std::declval<T>()));
+
+// nest++
+// Schema -> Computed Schema
+// nest--
+// nest++
+template<class... Ts>
+auto toComputed(Wrap<AllOf<Ts...>>)
+// nest++
+    -> Join<AllOf<ToComputed<Ts>...>, ToComputedValues<AllOf<Ts...>>>;
+// nest--
+// nest++
+// … keep remaining schema
+// nest--
+// nest--
+----
+--
+
+== !
+
+Demo
+
+== Qt - Gui
+
+[%build]
+* Qt moc - Meta Object Compiler
+* link:https://github.com/woboq/verdigris/issues[Woboq Verdigris]
+* … with internal APIs
+
+== Zusammenfassung
+
+Von einem Schema lässt sich fast alles ableiten.
+
+== &plus;+ Vorteile &plus;+ &nbsp;
+
+[%build]
+* Zentrales Schema Definition
+* Trennung von Logik und Daten
+* Sehr gute Testbarkeit
+
+== \-- Nachteile \--
+
+[%build]
+* Ungewohnt + Lernaufwand
+* C++ benötigt Boilerplate
+* Typen werden groß
+
+== Anwendungsszenarien
+
+[%build]
+* komplexe verteilte Software
+* Performancekritische Projekte
+
+== Links
+
+[%build]
+* link:https://github.com/woboq/verdigris[github.com/woboq/verdigris]
+* link:https://github.com/basicpp17[github.com/basicpp17]
+
+== !
+
+image::andreas.png[role="center", width="400"]
+
+&nbsp;
+
+[%build]
+* Andreas Reischuck
+* @*arBmind*
+
+[.cue]
+****
+Schulungen
+
+C++ - Qt - Clean Code
+****
+
+== !
+
+image::hicknhackLogo_new_text.png[role="center", width="400"]
+
+&nbsp;
+
+[.green]_Work_ with us…
+
+[.cue]
+****
+* C++ Qt UIs
+* Dresden
+****
+
+== !
+
+image::cppug.png[role="pull-right", width="550"]
+
+&nbsp;
+
+Give a [.green]*Talk* +
+=> get a *Dresden* tour
+
+[.cue]
+****
+* Video Recording
+* personal city tour
+* I visit your local usergroup
+****
+
+== !
+
+image::rebuild_logo.png[role="pull-left", width="450"]
+
+*Rebuild* language project
+
+[.bigger]
+&nbsp;
+
+[.center]
+[.green]__Collaborate__
+
+[.cue]
+****
+* improved language & tools for everybody
+* Compiler built with C++17
+****
+
+== Probiert *mehr* aus!
+
+== Probiert *Typ*-getriebene-*Entwicklung*!
+
+== Photo Credits
+
+[.small]
+* link:https://www.flickr.com/photos/purpleseadonkey/4775066884[Explosion] link:https://creativecommons.org/licenses/by/2.0/[(cc-by-license)]
+* link:https://www.flickr.com/photos/stormfarm/14704893215[Grand Valley cattle drive] link:https://creativecommons.org/licenses/by-sa/2.0/[(cc-by-sa-license)] - Cropped & Auto Toning
+
+[.subtitle]
+== Danke!
+
+[language-cpp]#`co_await question_ready()`#
