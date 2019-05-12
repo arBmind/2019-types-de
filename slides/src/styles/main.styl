@@ -123,3 +123,16 @@ svg
     dominant-baseline middle
     text-anchor middle
 
+  .bespoke-bullet-current
+    filter: url(#activeMarker)
+  
+  .clientMonitor .bespoke-bullet-current .MouseCursor
+    offset-path path('M-150,-50 c0,100 100,200 200,200 S200,100 0,0')
+    offset-rotate 0deg
+    animation: offsets 3s linear forwards;
+
+@keyframes offsets {
+  100% {
+    offset-distance: 100%;
+  }
+}

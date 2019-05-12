@@ -183,42 +183,58 @@ Für uns reicht erstmal der einfache Strong Type.
 == !
 
 ++++
+<!-- for editing help:
+ * https://editor.method.ac
+ * https://svg-edit.github.io/svgedit/releases/latest/editor/svg-editor.html
+-->
 <svg class="build" viewBox="0 0 1280 720" width="1920" height="1080">
-    <filter id="dropshadow" height="130%">
-        <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
-        <feOffset dx="0" dy="0" result="offsetblur"/>
-        <feComponentTransfer>
-            <feFuncA type="linear" slope="0.5"/>
-        </feComponentTransfer>
-        <feMerge> 
-            <feMergeNode/>
-            <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-    </filter>
-    <g class="clientMonitor build" transform="translate(400,180)">
-        <path class="UserScreen" style="filter:url(#dropshadow)" 
-            fill="#fff8dc" stroke="#222" stroke-width="2"
-            d="M-100,-60 h200 v120 h-200 z
-               m4,6 v108 h192 v-108 z
-               M-110,80 h5 
-                v-3 h12 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h7 v3 h3 
-                v-3 h12 v3 
-                h5 v5 H-110 z
-               M60,70 h30 v30 c0,7 -7,15 -15,15 c-8,0 -15,-8 -15,-15 z m15,0 v15"/>
+    <defs>
+        <filter id="dropshadow" height="130%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+            <feOffset dx="0" dy="0" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.5"/>
+            </feComponentTransfer>
+            <feMerge> 
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <rect id="activeRect" x="2%" y="2%" width="96%" height="96%" fill="#fff" rx="20" ry="20" fill-opacity="0" stroke="#8da" stroke-width="15" />
+        <filter id="activeMarker" filterUnits="objectBoundingBox">
+            <feImage xlink:href="#activeRect" preserveAspectRatio="none" />
+            <feMerge> 
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g class="clientMonitor" transform="translate(350,180) scale(1.5)">
+        <g class="build">
+            <path class="UserScreen" style="filter:url(#dropshadow)" 
+                fill="#fff8dc" stroke="#222" stroke-width="2"
+                d="M-100,-60 h200 v120 h-200 z
+                m4,6 v108 h192 v-108 z
+                M-110,80 h5 
+                    v-3 h12 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h7 v3 h3 
+                    v-3 h12 v3 
+                    h5 v5 H-110 z
+                M60,70 h30 v30 c0,7 -7,15 -15,15 c-8,0 -15,-8 -15,-15 z m15,0 v15"/>
 
-        <path class="UserScreenContent"
-            fill="#222" d="M-100,-60 m4,6 v108 h192 v-108 z"/>
+            <path class="UserScreenContent"
+                fill="#222" d="M-100,-60 m4,6 v108 h192 v-108 z"/>
+        </g>
 
         <path class="UserSmiley build"
             fill="#ddc" stroke="#222" stroke-width="1"
@@ -245,7 +261,7 @@ Für uns reicht erstmal der einfache Strong Type.
         </g>
     </g>
 
-    <g class="command build" transform="translate(700,100)">
+    <g class="command build" transform="translate(700,140)">
         <path class="commandArrow" style="filter:url(#dropshadow)"
             fill="#fca" stroke="#222" stroke-width="2"
             d="M-150,0
@@ -291,7 +307,7 @@ Für uns reicht erstmal der einfache Strong Type.
         <text class="ServerText" x="0" y="0">Server</text>
     </g>
 
-    <g class="events build" transform="translate(1100, 430)">
+    <g class="events build" transform="translate(1100, 450)">
         <path class="commandArrow" style="filter:url(#dropshadow)"
             fill="#fca" stroke="#222" stroke-width="2"
             d="M-150,0
@@ -318,7 +334,7 @@ Für uns reicht erstmal der einfache Strong Type.
             d="M-55,-65
                 h100 l10,40 h-7 l-3,-5 c-8,-14 -10,-20 -32,-20 h-50
                 l45,45 l-40,40
-                h45 c12,0 24,-4 32,-20 l4,-8 h7 l-12,50 h-98
+                h45 c12,0 24,-4 32,-20 l3,-5 h7 l-12,50 h-98
                 v-15 l40,-40 l-40,-40 z"
             transform="scale(0.66) translate(0,30)" />
         
@@ -343,7 +359,7 @@ Für uns reicht erstmal der einfache Strong Type.
         <text class="commandText" x="-20" y="0">Updates</text>
     </g>
 
-    <g class="views build" transform="translate(200, 500)">
+    <g class="views build" transform="translate(170, 550) scale(1.5)">
         <path class="ViewScreen" style="filter:url(#dropshadow)"
             fill="#fff8dc" stroke="#222" stroke-width="2"
             d="M-100,-60 h200 v120 h-200 z
