@@ -10,6 +10,9 @@
 @require "prismjs/themes/prism.css"
 @require "prismjs/plugins/toolbar/prism-toolbar.css"
 
+span[class*="language-"] > code[class*="language-"]
+    font-family "Fira Code", Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
+
 pre.source
     text-shadow none
     border none
@@ -26,6 +29,7 @@ pre.source
         //box-shadow none
         padding 0
         background none
+        font-family "Fira Code", Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
 
         > b
             display none

@@ -18,6 +18,7 @@
 Willkommen
 
 Zielstellung:
+
 * Wir spielen / hacken?
 * Verstehen - Was ist das?
 * Weniger: Wofür brauch ich das?
@@ -93,7 +94,7 @@ Strong Types
 * Bevor wir auf typ-getriebene Entwicklung eingehen…
 ****
 
-[.source]
+[.source.s62x16]
 == !
 
 [.build]
@@ -181,8 +182,11 @@ Für uns reicht erstmal der einfache Strong Type.
 
 [.cue]
 ****
-Typgetriebene Entwicklung eine weiterentwicklung von Daten getriebenem Design.
+Vergleiche und Abgrenzungen und ein paar Begriffe
 ****
+
+[.subtitle]
+== Data-Oriented Design vs. Typgetrieben
 
 == Wer hat davon gehört / gelesen?
 
@@ -199,17 +203,20 @@ image::MikeActon_Data-Oriented_Design_CcpCon2014.png[role="center", width="1280"
 
 link:https://www.youtube.com/watch?v=rX0ItVEVjHc[CppCon 2014: Mike Acton "Data-Oriented Design and C++"]
 
+link:https://github.com/dbartolini/data-oriented-design[github.com/dbartolini/data-oriented-design]
+
 [.cue]
 ****
 Mike Acton, Engine Director vor Insomniac Games hat das Thema auf der CppCon 2014 eindrucksvoll vorgeführt.
 
 Seitdem gab es eine Menge Vorträge.
+Data-Oriented Design ist eine Optimierung für die Caches der CPU.
 
-Was ist da der Unterschied?
-* zB. zu Objektorientiertem Design
+Typgetriebene Entwicklung ist Modellierung.
+Wir können und wollen damit sehr gut Daten orientiert arbeiten.
 ****
 
-== Objektorientiert vs. Datengetrieben
+== Objektorientiert vs. Datenorientiert
 
 [%build.compare]
 * [.left]##Entity (== Klasse)##
@@ -224,6 +231,7 @@ Was ist da der Unterschied?
 Es gibt sicher komplexe wissenschaftliche Abhandlungen
 
 Meine diletantische Zusammenfassung hier:
+
 * Der Fokus auf Klassen vs. Strukturen
 
 Services die mit Daten-Protokollen verbunden sind.
@@ -269,6 +277,7 @@ Hmm, das gibts doch schon?
 [.cue]
 ****
 Das Problem ist analog?
+
 * Schema treibt Protokoll / Speicherformat
 * Austausch zwischen Softwarekomponenten
 ****
@@ -280,6 +289,7 @@ image::Geburtstag.jpg[role="center", width="1920"]
 [.cue]
 ****
 Wir haben alle Begriffe
+
 * Strong Types
 * Protokolle, Services und Repositories
 * Datenschema
@@ -357,10 +367,13 @@ Trotzdem dun wir so als ob die Erde ein Scheibe wäre.
 [.cue]
 ****
 Invarianten:
+
 * keine doppelten IDs
 * Nur bestimmte Knoten auf Ebenen
 * Tiefenlimit
+
 Speicherung
+
 * Sortierung (automatisch/vom Nutzer)
 ****
 
@@ -372,6 +385,7 @@ image::mortonus_explosion.jpg[]
 [.cue]
 ****
 Wie lösen wir das?
+
 * Auf Umwegen - mit Schemas
 ****
 
@@ -427,7 +441,7 @@ Ein Baum ist jetzt genau das, was wir in unserer Anwendung darunter verstehen.
 Ok, jetzt können wir die benutzen.
 ****
 
-[.source]
+[.source.s62x16]
 == !
 
 [.build]
@@ -546,7 +560,7 @@ Wir müssen kein Protokoll einhalten - alles steht uns zur Verfügung.
 Zunächst brauchen wir etwas Boilerplate für das ADL.
 ****
 
-[.source.s54x13]
+[.source.s62x16]
 == !
 
 [.build]
@@ -586,10 +600,10 @@ Außen ein Namespace.
 Uns interessiert nur, was für ein Rückgabetyp zurück kommt.
 Jeden Typ verpacken wir in unser Wrap.
 
-Jetzt brauchen wir nur die Funktion weiter zu speziailisieren.
+Jetzt brauchen wir nur die Funktion weiter zu spezialisieren.
 ****
 
-[.source.s67x16]
+[.source.s62x16]
 == !
 
 [.build]
@@ -641,7 +655,7 @@ Wir rufen ToStorage auch für unsere Primitiven auf.
 Dafür brauchen wir auch noch eine Spezialisierung.
 ****
 
-[.source.s67x16]
+[.source.s62x16]
 == !
 
 [.build]
@@ -686,7 +700,7 @@ Ok. Prinzip klar?
 Dann schauen wir mal, was beim Baum passiert.
 ****
 
-[.source.s67x16]
+[.source.s62x16]
 == !
 
 [.build]
@@ -741,7 +755,7 @@ Basierend auf dem Schema bauen wir Datenstrukturen für alle Befehle auf.
 Den ADL Boilerplate erspare ich euch, der ist immer gleich.
 ****
 
-[.source]
+[.source.s62x16]
 == !
 
 [.build]
@@ -776,7 +790,7 @@ Create, Update und Delete.
 Nur Update ist Rekursiv!
 ****
 
-[.source.s77x19]
+[.source.s90x23]
 == !
 
 [.build]
@@ -841,7 +855,7 @@ Wie Ihr seht kann man immer lokal arbeiten.
 Den gleichen Pattern können wir nun auch nutzen um Repositories aus dem Schema abzuleiten.
 ****
 
-[.source.s67x16]
+[.source.s62x16]
 == !
 
 [.build]
@@ -863,7 +877,7 @@ Das reicht aus.
 Zum besseren Testen kann es hilfreich sein, eigene Klassen zu erstellen…
 ****
 
-[.source.s67x16]
+[.source.s62x16]
 == !
 
 [.build]
@@ -1027,7 +1041,7 @@ Protokolle - da kommt nichts neues
 
 == Berechnungen
 
-[.source.s77x19]
+[.source.s90x23]
 == !
 
 [.build]
@@ -1060,7 +1074,7 @@ void compute(const ToStorage<PersonData>& s, Ansprache& o) {
 ----
 --
 
-[.source.s77x19]
+[.source.s90x23]
 == !
 
 [.build]
@@ -1116,7 +1130,7 @@ Von einem Schema lässt sich fast alles ableiten.
 [%build]
 * Ungewohnt + Lernaufwand
 * C++ benötigt Boilerplate
-* Typen werden groß
+* lange Typennamen
 
 == Anwendungsszenarien
 
