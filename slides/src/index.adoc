@@ -212,7 +212,7 @@ Für uns reicht erstmal der einfache Strong Type.
     <g class="clientMonitor" transform="translate(350,180) scale(1.5)">
         <g class="build">
             <path class="UserScreen" style="filter:url(#dropshadow)" 
-                fill="#fff8dc" stroke="#222" stroke-width="2"
+                fill="#fff8dc" stroke="#222" stroke-width="1.33"
                 d="M-100,-60 h200 v120 h-200 z
                 m4,6 v108 h192 v-108 z
                 M-110,80 h5 
@@ -237,7 +237,7 @@ Für uns reicht erstmal der einfache Strong Type.
         </g>
 
         <path class="UserSmiley build"
-            fill="#ddc" stroke="#222" stroke-width="1"
+            fill="#ddc" stroke="#222" stroke-width="0.66"
             d="M0,-20 a20,20 0,0,0, 0,40 a20,20 0,0,0, 0,-40z 
                 m-15,25 a16,10 0,0,0, 30,0
                 m-7,-13 a3,3 0,1,0, 1,0 z
@@ -361,7 +361,7 @@ Für uns reicht erstmal der einfache Strong Type.
 
     <g class="views build" transform="translate(170, 550) scale(1.5)">
         <path class="ViewScreen" style="filter:url(#dropshadow)"
-            fill="#fff8dc" stroke="#222" stroke-width="2"
+            fill="#fff8dc" stroke="#222" stroke-width="1.33"
             d="M-100,-60 h200 v120 h-200 z
                m4,6 v108 h192 v-108 z
                M-5,60 v10 h-20 v5 h50 v-5 h-20 v-10 z"/>
