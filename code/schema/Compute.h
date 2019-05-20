@@ -10,12 +10,12 @@ using storage::isValue;
 using storage::ToStorage;
 // clang-format off
 
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 
 template<class T> auto toComputed(T);
 
 template<class T>
-using ToComputed = decltype(toComputed(Wrap<T>{}));
+using ToComputed = decltype(toComputed(ADL<T>{}));
 
 // tag::ansprache[]
 inline void compute(const ToStorage<PersonData>& s, Ansprache& o) {
@@ -46,20 +46,20 @@ using ToComputedValues = decltype(toComputedValues(std::declval<T>()));
 
 // Schema -> Computed Schema
 template<class... Ts>
-auto toComputed(Wrap<AllOf<Ts...>>)
+auto toComputed(ADL<AllOf<Ts...>>)
     -> Join<AllOf<ToComputed<Ts>...>, ToComputedValues<AllOf<Ts...>>>;
 // … keep remaining schema
 // end::toComputedValues[]
 
 template<class... Ts>
-auto toComputed(Wrap<OneOf<Ts...>>) -> OneOf<ToComputed<Ts>...>;
+auto toComputed(ADL<OneOf<Ts...>>) -> OneOf<ToComputed<Ts>...>;
 
 template<class T>
-auto toComputed(Wrap<T>)
+auto toComputed(ADL<T>)
     -> std::enable_if_t<isValue<T>(), T>;
 
 template<class Id, class Data>
-auto toComputed(Wrap<EntitySet<Id, Data>>)
+auto toComputed(ADL<EntitySet<Id, Data>>)
     -> EntitySet<Id, ToComputed<Data>>;
 
 } // namespace compute

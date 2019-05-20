@@ -12,26 +12,26 @@ using storage::ToStorage;
 // clang-format off
 
 // tag::boilerplate[]
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 
 template<class T>
 constexpr auto toCommandProcessor(T); // Lambda(cmd, repo&)
 
 template<class T>
-constexpr auto to_command_processor = toCommandProcessor(Wrap<T>{});
+constexpr auto to_command_processor = toCommandProcessor(ADL<T>{});
 // end::boilerplate[]
 
 // clang-format on
 
 template<class... Ts>
-constexpr auto toCommandProcessor(Wrap<AllOf<Ts...>>) {
+constexpr auto toCommandProcessor(ADL<AllOf<Ts...>>) {
     return [](const ToCommand<AllOf<Ts...>> &cmd, ToRepository<AllOf<Ts...>> &repo) {
         return (to_command_processor<Ts>(std::get<ToCommand<Ts>>(cmd), std::get<ToRepository<Ts>>(repo)), ...);
     };
 }
 
 template<class T, std::enable_if_t<isValue<T>(), void *> = nullptr>
-constexpr auto toCommandProcessor(Wrap<T>) {
+constexpr auto toCommandProcessor(ADL<T>) {
     return [](const ToCommand<T> &cmd, ToRepository<T> &repo) {
         if (cmd) repo = *cmd;
     };
@@ -50,7 +50,7 @@ auto oneVisit(V &&v, Fs &&... fs) {
 // clang-format off
 // tag::entitySet[]
 template<class Id, class Data>
-constexpr auto toCommandProcessor(Wrap<EntitySet<Id, Data>>) {
+constexpr auto toCommandProcessor(ADL<EntitySet<Id, Data>>) {
   return [](const ToCommand<EntitySet<Id, Data>> &cmd,
             ToRepository<EntitySet<Id, Data>> &repo) {
     oneVisit(cmd,

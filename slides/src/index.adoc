@@ -797,7 +797,7 @@ Zunächst brauchen wir etwas Boilerplate für das ADL.
 namespace storage {
 
 // nest++
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 // nest--
 
 // nest++
@@ -806,7 +806,7 @@ template<class T> auto toStorage(T);
 
 // nest++
 template<class T>
-using ToStorage = decltype(toStorage(Wrap<T>{}));
+using ToStorage = decltype(toStorage(ADL<T>{}));
 // nest--
 
 } // namespace storage
@@ -818,12 +818,12 @@ using ToStorage = decltype(toStorage(Wrap<T>{}));
 ****
 Außen ein Namespace.
 
-* Wrap sorgt dafür dass alles in unserem Namespace ist.
+* ADL Wrapper sorgt dafür dass alles in unserem Namespace ist.
 * toStorage bildet die Typ-Transformation ab.
 * ToStorage erleichtert uns die Auswertung.
 
 Uns interessiert nur, was für ein Rückgabetyp zurück kommt.
-Jeden Typ verpacken wir in unser Wrap.
+Jeden Typ verpacken wir in unser ADL Wrapper.
 
 Jetzt brauchen wir nur die Funktion weiter zu spezialisieren.
 ****
@@ -837,7 +837,7 @@ Jetzt brauchen wir nur die Funktion weiter zu spezialisieren.
 ----
 // nest++
 template<class... Ts>
-auto toStorage(Wrap<AllOf<Ts...>>)
+auto toStorage(ADL<AllOf<Ts...>>)
 // nest++
     -> std::tuple<ToStorage<Ts>...>;
 // nest--
@@ -845,7 +845,7 @@ auto toStorage(Wrap<AllOf<Ts...>>)
 
 // nest++
 template<class... Ts>
-auto toStorage(Wrap<OneOf<Ts...>>)
+auto toStorage(ADL<OneOf<Ts...>>)
 // nest++
     -> std::variant<ToStorage<Ts>...>;
 // nest--
@@ -853,7 +853,7 @@ auto toStorage(Wrap<OneOf<Ts...>>)
 
 // nest++
 template<class Id, class Data>
-auto toStorage(Wrap<EntitySet<Id, Data>>)
+auto toStorage(ADL<EntitySet<Id, Data>>)
 // nest++
     -> std::vector<std::tuple<Id, ToStorage<Data>>>;
 // nest--
@@ -904,7 +904,7 @@ constexpr bool isValue() {
 
 // nest++
 template<class T>
-auto toStorage(Wrap<T>)
+auto toStorage(ADL<T>)
     -> std::enable_if_t<isValue<T>(), T>;
 // nest--
 ----
@@ -952,7 +952,7 @@ using TreeNode = std::tuple<
 
 // nest++
 template<class Id, class Node, class Leaf>
-auto toStorage(Wrap<OrderedTree<Id, Node, Leaf>>)
+auto toStorage(ADL<OrderedTree<Id, Node, Leaf>>)
     -> std::vector<TreeNode<Id, Node, Leaf>>;
 // nest--
 ----
@@ -988,7 +988,7 @@ Den ADL Boilerplate erspare ich euch, der ist immer gleich.
 [source%nested, cpp]
 ----
 template<class Id, class Data>
-auto toCommand(Wrap<EntitySet<Id, Data>>)
+auto toCommand(ADL<EntitySet<Id, Data>>)
 // nest++
     -> std::variant<
       // nest++
@@ -1041,7 +1041,7 @@ using TreeUpdate = std::tuple<
 
 // nest++
 template<class Id, class Node, class Leaf>
-auto toCommand(Wrap<OrderedTree<Id, Node, Leaf>>)
+auto toCommand(ADL<OrderedTree<Id, Node, Leaf>>)
 // nest++
     -> std::variant<
       // nest++
@@ -1088,7 +1088,7 @@ Den gleichen Pattern können wir nun auch nutzen um Repositories aus dem Schema 
 [source%nested, cpp]
 ----
 template<class Id, class Data>
-auto toRepository(Wrap<EntitySet<Id, Data>>)
+auto toRepository(ADL<EntitySet<Id, Data>>)
 // nest++
     -> std::map<Id, ToRepository<Data>>;
 // nest--
@@ -1127,7 +1127,7 @@ public:
 
 // nest++
 template<class Id, class Data>
-auto toRepository(Wrap<EntitySet<Id, Data>>)
+auto toRepository(ADL<EntitySet<Id, Data>>)
 // nest--
 // nest++
     -> EntityRepository<Id, Data>;
@@ -1171,7 +1171,7 @@ Damit wir den Pattern nicht zu start abwandeln müssen, nutzen wir Lambdas…
 namespace processor {
 
 // nest++
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 // nest--
 
 // nest++
@@ -1180,7 +1180,7 @@ template<class T> auto toCommandProcessor(T); // Lambda(cmd, repo&)
 
 // nest++
 template<class T>
-constexpr auto to_command_processor = toCommandProcessor(Wrap<T>{});
+constexpr auto to_command_processor = toCommandProcessor(ADL<T>{});
 // nest--
 
 } // namespace processor
@@ -1189,7 +1189,7 @@ constexpr auto to_command_processor = toCommandProcessor(Wrap<T>{});
 
 [.cue]
 ****
-Wir haben weiterhin das Wrap für ADL.
+Wir haben weiterhin das Wrapper für ADL.
 
 toCommandProcessor liefert ein Lambda.
 Das Lambda erwartet ein Command und eine Referenz auf das passende Repository.
@@ -1207,7 +1207,7 @@ Für ein EntitySet sieht dass dann wie folgt aus…
 [source%nested, cpp]
 ----
 template<class Id, class Data>
-constexpr auto toCommandProcessor(Wrap<EntitySet<Id, Data>>) {
+constexpr auto toCommandProcessor(ADL<EntitySet<Id, Data>>) {
     // nest++
     return [](const ToCommand<EntitySet<Id, Data>>& cmd, 
               ToRepository<EntitySet<Id, Data>>& repo) {
@@ -1317,7 +1317,7 @@ using ToComputedValues = decltype(toComputedValues(std::declval<T>()));
 // nest--
 // nest++
 template<class... Ts>
-auto toComputed(Wrap<AllOf<Ts...>>)
+auto toComputed(ADL<AllOf<Ts...>>)
 // nest++
     -> Join<AllOf<ToComputed<Ts>...>, ToComputedValues<AllOf<Ts...>>>;
 // nest--

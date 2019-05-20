@@ -14,26 +14,26 @@ using storage::isValue;
 using storage::ToStorage;
 
 // clang-format off
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 
 template<class T> auto toCommand(T);
 
 template<class T>
-using ToCommand = decltype(toCommand(Wrap<T>{}));
+using ToCommand = decltype(toCommand(ADL<T>{}));
 
 // clang-format on
 
 template<class... Ts>
-auto toCommand(Wrap<AllOf<Ts...>>) -> std::tuple<ToCommand<Ts>...>;
+auto toCommand(ADL<AllOf<Ts...>>) -> std::tuple<ToCommand<Ts>...>;
 
 template<class T>
-auto toCommand(Wrap<T>) -> std::enable_if_t<isValue<T>(), std::optional<T>>;
+auto toCommand(ADL<T>) -> std::enable_if_t<isValue<T>(), std::optional<T>>;
 
 // tag::entitySet[]
 template<class Id, class Data>
-auto toCommand(Wrap<EntitySet<Id, Data>>) -> std::variant<ToStorage<Data>,                 // Create
-                                                          std::tuple<Id, ToCommand<Data>>, // Update
-                                                          Id>;                             // Delete
+auto toCommand(ADL<EntitySet<Id, Data>>) -> std::variant<ToStorage<Data>,                 // Create
+                                                         std::tuple<Id, ToCommand<Data>>, // Update
+                                                         Id>;                             // Delete
 // end::entitySet[]
 
 using storage::ParentId;
@@ -53,7 +53,7 @@ using TreeUpdate = std::tuple<
     Id, std::variant<ToCommand<Node>, ToCommand<Leaf>>>;
 
 template<class Id, class Node, class Leaf>
-auto toCommand(Wrap<OrderedTree<Id, Node, Leaf>>)
+auto toCommand(ADL<OrderedTree<Id, Node, Leaf>>)
     -> std::variant<
         TreeCreate<Id, Node, Leaf>,                 // Create
         TreeUpdate<Id, Node, Leaf>,                 // Update

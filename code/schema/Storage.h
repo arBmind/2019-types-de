@@ -12,25 +12,25 @@
 // Storage ADL Boilerplate
 namespace storage {
 
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 
 template<class T> auto toStorage(T);
 
 template<class T>
-using ToStorage = decltype(toStorage(Wrap<T>{}));
+using ToStorage = decltype(toStorage(ADL<T>{}));
 // end::adl_boilerplate[]
 
 // tag::abstracts[]
 template<class... Ts>
-auto toStorage(Wrap<AllOf<Ts...>>)
+auto toStorage(ADL<AllOf<Ts...>>)
     -> std::tuple<ToStorage<Ts>...>;
 
 template<class... Ts>
-auto toStorage(Wrap<OneOf<Ts...>>)
+auto toStorage(ADL<OneOf<Ts...>>)
     -> std::variant<ToStorage<Ts>...>;
 
 template<class Id, class Data>
-auto toStorage(Wrap<EntitySet<Id, Data>>)
+auto toStorage(ADL<EntitySet<Id, Data>>)
     -> std::vector<std::tuple<Id, ToStorage<Data>>>;
 // end::abstracts[]
 
@@ -45,7 +45,7 @@ constexpr bool isValue() {
 }
 
 template<class T>
-auto toStorage(Wrap<T>)
+auto toStorage(ADL<T>)
     -> std::enable_if_t<isValue<T>(), T>;
 // end::values[]
 // end::abstracts[]
@@ -62,7 +62,7 @@ using TreeNode = std::tuple<
     >;
 
 template<class Id, class Node, class Leaf>
-auto toStorage(Wrap<OrderedTree<Id, Node, Leaf>>)
+auto toStorage(ADL<OrderedTree<Id, Node, Leaf>>)
     -> std::vector<TreeNode<Id, Node, Leaf>>;
 // end::orderedtree[]
 

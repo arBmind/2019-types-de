@@ -15,26 +15,26 @@ using storage::isValue;
 using storage::ToStorage;
 
 // clang-format off
-template<class T> struct Wrap {};
+template<class T> struct ADL {};
 
 template<class T> auto toRepository(T);
 
 template<class T>
-using ToRepository = decltype(toRepository(Wrap<T>{}));
+using ToRepository = decltype(toRepository(ADL<T>{}));
 
 // clang-format on
 
 template<class... Ts>
-auto toRepository(Wrap<AllOf<Ts...>>) -> std::tuple<ToRepository<Ts>...>;
+auto toRepository(ADL<AllOf<Ts...>>) -> std::tuple<ToRepository<Ts>...>;
 
 template<class T>
-auto toRepository(Wrap<T>) -> std::enable_if_t<isValue<T>(), T>;
+auto toRepository(ADL<T>) -> std::enable_if_t<isValue<T>(), T>;
 
 namespace simple {
 
 // tag::simpleEntitySet[]
 template<class Id, class Data>
-auto toRepository(Wrap<EntitySet<Id, Data>>) -> std::map<Id, ToRepository<Data>>;
+auto toRepository(ADL<EntitySet<Id, Data>>) -> std::map<Id, ToRepository<Data>>;
 // end::simpleEntitySet[]
 
 } // namespace simple
@@ -56,7 +56,7 @@ public:
 };
 
 template<class Id, class Data>
-auto toRepository(Wrap<EntitySet<Id, Data>>) //
+auto toRepository(ADL<EntitySet<Id, Data>>) //
     -> EntityRepository<Id, Data>;
 // end::entityRepository[]
 
