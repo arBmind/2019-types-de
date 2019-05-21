@@ -178,7 +178,10 @@ Für uns reicht erstmal der einfache Strong Type.
 ****
 
 
-== verteiltes System
+== Anwendungsfall
+
+[%build]
+* verteiltes System
 
 == !
 
@@ -403,6 +406,7 @@ Für uns reicht erstmal der einfache Strong Type.
 ++++
 
 
+////
 == !
 
 [.cue]
@@ -464,12 +468,16 @@ Services die mit Daten-Protokollen verbunden sind.
 Anders die Herausforderung:
 ****
 
+////
+
+////
 == Herausforderungen
 
 [%build]
 * Protokolle (Daten)
 * Services (Berechnung)
 * Repository (Datenhaltung)
+* Gui (Modelle)
 
 [.cue]
 ****
@@ -483,6 +491,7 @@ Anders die Herausforderung:
 
 Das nennen wir hier:
 ****
+////
 
 [.subtitle]
 == Datenschema
@@ -520,8 +529,11 @@ Wir haben alle Begriffe
 * Datenschema
 
 Bevor wir losessen, brauchen wir noch Motivation.
-Nicht wirklich ein Anwendungsbeispiel, sodern eine ganze Klasse:
+Nicht wirklich ein Anwendungsbeispiel, sondern eine ganze Klasse:
 ****
+
+////
+== Komplexität
 
 [.subtitle]
 == Baum
@@ -613,6 +625,7 @@ Wie lösen wir das?
 
 * Auf Umwegen - mit Schemas
 ****
+////
 
 [.subtitle]
 == Schema mit C++
@@ -709,14 +722,51 @@ Statt fixer Container haben wir abstrakte Konzepte.
 [.canvas]
 image::grandValleyCattleDrive.jpg[]
 
+[.source.s62x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// nest++
+using Command = ToCommand<Persons>;
+// nest--
+// nest++
+using Repository = ToRepository<Persons>;
+// nest--
+// nest++
+constexpr auto command_processor = 
+    to_command_processor<Persons>;
+// nest--
+
+// nest++
+void testCreate() {
+    // nest++
+    auto repo = Repository{};
+    // nest--
+    // nest++
+    using CreateCmd = EntityCreate<PersonData>;
+    // nest--
+    // nest++
+    auto cmd = CreateCmd{ Anrede::Herr, 
+        Vorname{"Bjarne"}, Nachname{"Stroustrup"} };
+    // nest--
+    // nest++
+    command_processor(cmd, repo);
+    // nest--
+}
+// nest--
+----
+--
+
 == Ziele
 
 [%build]
-* Speicherung
-* Befehle
-* Repository
-* Netzwerk-Protokolle
-* Verarbeitung
+* [language-cpp]#`ToCommand<T>`# - Befehle
+* [language-cpp]#`ToRepository<T>`# - Repository
+* [language-cpp]#`to_command_processor<T>`# - Verarbeitung
+* Netzwerk-Protokolle, Gui, …
 
 [.cue]
 ****
@@ -727,19 +777,58 @@ image::grandValleyCattleDrive.jpg[]
 * komplexe Verarbeitung der Daten
 ****
 
+
+== Einfache Speicherung
+
+[.cue]
+****
+Die Daten müssen nur abgespeichert werden, damit sie nicht verloren gehen.
+
+Wir müssen kein Protokoll einhalten - alles steht uns zur Verfügung.
+****
+
+[.source.s62x16]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+// nest++
+// nest++
+template<class T>
+auto toStorage(T);
+// nest--
+
+template<class T>
+using ToStorage = decltype(toStorage(T));
+// nest--
+
+// nest++
+template<class... Ts>
+auto toStorage(AllOf<Ts...>)
+// nest++
+    -> std::tuple<ToStorage<Ts>...>;
+// nest--
+// nest--
+
+// nest++
+template<class... Ts>
+auto toStorage(OneOf<Ts...>)
+// nest++
+    -> std::variant<ToStorage<Ts>...>;
+// nest--
+// nest--
+----
+--
+
+
 == Pattern
 
 [%build]
 * Je abstraktem Typ
-* Eine Interpretation
-* Rekursion für alle Untertypen
-
-[.cue]
-****
-… mit der Rekursion bekommen wir ein Problem.
-
-Wir arbeiten mit Templates. Die Reihenfolge ist wichtig…
-****
+* Eine Spezialisierung
+* Rekursion für Untertypen
 
 == Reihenfolge-Problem
 
@@ -772,17 +861,6 @@ So lange unsere Argumente in einem Namensraum sind, finden wir Funktionen auch i
 Puhh!
 
 Schauen wir uns das mal für die einfache Speicherung an…
-****
-
-== Einfache Speicherung
-
-[.cue]
-****
-Die Daten müssen nur abgespeichert werden, damit sie nicht verloren gehen.
-
-Wir müssen kein Protokoll einhalten - alles steht uns zur Verfügung.
-
-Zunächst brauchen wir etwas Boilerplate für das ADL.
 ****
 
 [.source.s62x16]
