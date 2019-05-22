@@ -16,7 +16,6 @@ using storage::ToStorage;
 
 // clang-format off
 template<class T> struct ADL {};
-template<class T> auto toCommand(T);
 template<class T>
 using ToCommand = decltype(toCommand(ADL<T>{}));
 // clang-format on

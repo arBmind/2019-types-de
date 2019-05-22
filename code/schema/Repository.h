@@ -17,12 +17,8 @@ using storage::ToStorage;
 
 // clang-format off
 template<class T> struct ADL {};
-
-template<class T> auto toRepository(T);
-
 template<class T>
 using ToRepository = decltype(toRepository(ADL<T>{}));
-
 // clang-format on
 
 template<class... Ts>

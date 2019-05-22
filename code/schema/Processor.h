@@ -14,10 +14,6 @@ using storage::ToStorage;
 
 // tag::boilerplate[]
 template<class T> struct ADL {};
-
-template<class T>
-constexpr auto toCommandProcessor(T); // Lambda(cmd, repo&)
-
 template<class T>
 constexpr auto to_command_processor = toCommandProcessor(ADL<T>{});
 // end::boilerplate[]
