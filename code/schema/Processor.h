@@ -4,6 +4,7 @@
 
 namespace processor {
 
+using namespace abstract;
 using command::ToCommand;
 using repository::ToRepository;
 using storage::isValue;

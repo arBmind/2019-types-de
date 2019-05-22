@@ -10,6 +10,7 @@
 
 namespace command {
 
+using namespace abstract;
 using storage::isValue;
 using storage::ToStorage;
 

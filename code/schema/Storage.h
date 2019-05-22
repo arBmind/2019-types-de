@@ -15,6 +15,7 @@ namespace storage {
 template<class T> struct ADL {};
 
 template<class T> auto toStorage(T);
+using namespace abstract;
 
 template<class T>
 using ToStorage = decltype(toStorage(ADL<T>{}));

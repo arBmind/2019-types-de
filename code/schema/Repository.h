@@ -11,6 +11,7 @@
 
 namespace repository {
 
+using namespace abstract;
 using storage::isValue;
 using storage::ToStorage;
 

@@ -6,6 +6,7 @@
 
 namespace compute {
 
+using namespace abstract;
 using storage::isValue;
 using storage::ToStorage;
 // clang-format off
