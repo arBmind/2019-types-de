@@ -108,7 +108,7 @@ div.code-toolbar
 .token.url,
 .language-css .token.string,
 .style .token.string
-  background: inherit;
+  background inherit
 
 .twitter
   display block
@@ -124,15 +124,24 @@ svg
     text-anchor middle
 
   .bespoke-bullet-current
-    filter: url(#activeMarker)
+    filter url(#activeMarker)
   
   .clientMonitor .bespoke-bullet-current .MouseCursor
     offset-path path('M-150,-50 c0,100 100,200 200,200 S200,100 0,0')
     offset-rotate 0deg
-    animation: offsets 3s linear forwards;
+    animation offsets 3s linear forwards
+  
+  .cppVersion
+    filter url(#dropshadow)
+    fill #dfc
 
 @keyframes offsets {
   100% {
-    offset-distance: 100%;
+    offset-distance 100%
   }
 }
+
+.overlay
+  position absolute
+  left 0
+  right 0

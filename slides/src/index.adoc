@@ -13,6 +13,14 @@
 
 *ADC++, Regensburg, Mai 2019*
 
+++++
+<svg class="overlay build" viewBox="0 0 1280 720" width="1920" height="1080">
+    <g transform="translate(430,250) scale(3) rotate(10)">
+        <text class="cppVersion build" x="0" y="0">17</text>
+    </g>
+</svg>
+++++
+
 [.cue]
 ****
 Willkommen
@@ -192,7 +200,7 @@ Für uns reicht erstmal der einfache Strong Type.
 -->
 <svg class="build" viewBox="0 0 1280 720" width="1920" height="1080">
     <defs>
-        <filter id="dropshadow" height="130%">
+        <filter id="dropshadow" height="130%" width="130%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
             <feOffset dx="0" dy="0" result="offsetblur"/>
             <feComponentTransfer>
