@@ -725,11 +725,6 @@ Statt Datenfeldern haben wir Typen.
 Statt fixer Container haben wir abstrakte Konzepte.
 ****
 
-== Typ getriebene [.green]#Code Generierung#
-
-[.canvas]
-image::grandValleyCattleDrive.jpg[]
-
 [.source.s62x16]
 == !
 
@@ -744,7 +739,7 @@ using Command = ToCommand<Persons>;
 using Repository = ToRepository<Persons>;
 // nest--
 // nest++
-constexpr auto command_processor = 
+constexpr auto processCommand = 
     to_command_processor<Persons>;
 // nest--
 
@@ -761,12 +756,17 @@ void testCreate() {
         Vorname{"Bjarne"}, Nachname{"Stroustrup"} };
     // nest--
     // nest++
-    command_processor(cmd, repo);
+    processCommand(cmd, repo);
     // nest--
 }
 // nest--
 ----
 --
+
+== Typ getriebene [.green]#Code Generierung#
+
+[.canvas]
+image::grandValleyCattleDrive.jpg[]
 
 == Ziele
 
@@ -815,28 +815,15 @@ using ToStorage = decltype(toStorage(T));
 // nest++
 template<class... Ts>
 auto toStorage(AllOf<Ts...>)
-// nest++
     -> std::tuple<ToStorage<Ts>...>;
-// nest--
 // nest--
 
 // nest++
-template<class... Ts>
-auto toStorage(OneOf<Ts...>)
-// nest++
-    -> std::variant<ToStorage<Ts>...>;
-// nest--
+using Test = ToStorage<AllOf<>>; // error
 // nest--
 ----
 --
 
-
-== Pattern
-
-[%build]
-* Je abstraktem Typ
-* Eine Spezialisierung
-* Rekursion für Untertypen
 
 == Reihenfolge-Problem
 
@@ -878,16 +865,12 @@ Schauen wir uns das mal für die einfache Speicherung an…
 --
 [source%nested, cpp]
 ----
-// Storage ADL Boilerplate
+// Storage with ADL
 // nest++
 namespace storage {
 
 // nest++
 template<class T> struct ADL {};
-// nest--
-
-// nest++
-template<class T> auto toStorage(T);
 // nest--
 
 // nest++
@@ -905,11 +888,7 @@ using ToStorage = decltype(toStorage(ADL<T>{}));
 Außen ein Namespace.
 
 * ADL Wrapper sorgt dafür dass alles in unserem Namespace ist.
-* toStorage bildet die Typ-Transformation ab.
-* ToStorage erleichtert uns die Auswertung.
-
-Uns interessiert nur, was für ein Rückgabetyp zurück kommt.
-Jeden Typ verpacken wir in unser ADL Wrapper.
+* ToStorage kann sogar unbekannte Funktion mit ADL benutzen.
 
 Jetzt brauchen wir nur die Funktion weiter zu spezialisieren.
 ****
@@ -966,6 +945,13 @@ Wir rufen ToStorage auch für unsere Primitiven auf.
 Dafür brauchen wir auch noch eine Spezialisierung.
 ****
 
+== Pattern
+
+[%build]
+* Je abstraktem Typ
+* Eine Spezialisierung
+* Rekursion für Untertypen
+
 [.source.s62x16]
 == !
 
@@ -1020,11 +1006,12 @@ Dann schauen wir mal, was beim Baum passiert.
 ----
 // Storage for OrderedTree
 // nest++
+// nest++
+// nest++
 template<class Id>
 using ParentId = StrongAddTag<Id, struct ParentIdTag>;
 // nest--
 
-// nest++
 template<class Id, class Node, class Leaf>
 using TreeNode = std::tuple<
 // nest++
@@ -1036,7 +1023,6 @@ using TreeNode = std::tuple<
     >;
 // nest--
 
-// nest++
 template<class Id, class Node, class Leaf>
 auto toStorage(ADL<OrderedTree<Id, Node, Leaf>>)
     -> std::vector<TreeNode<Id, Node, Leaf>>;
@@ -1073,18 +1059,31 @@ Den ADL Boilerplate erspare ich euch, der ist immer gleich.
 --
 [source%nested, cpp]
 ----
+// nest++
+template<class Data>
+using EntityCreate = ToStorage<Data>;
+// nest--
+// nest++
+template<class Id, class Data>
+using EntityUpdate = std::tuple<Id, ToCommand<Data>>;
+// nest--
+// nest++
+template<class Id>
+using EntityDelete = Id;
+// nest--
+
 template<class Id, class Data>
 auto toCommand(ADL<EntitySet<Id, Data>>)
 // nest++
     -> std::variant<
       // nest++
-        ToStorage<Data>,                 // Create
+        EntityCreate<Data>,
       // nest--
       // nest++
-        std::tuple<Id, ToCommand<Data>>, // Update
+        EntityUpdate<Id, Data>,
       // nest--
       // nest++
-        Id>;                             // Delete
+        EntityDelete<Id>>;
       // nest--
 // nest--
 ----
@@ -1116,13 +1115,20 @@ using TreeCreate = std::tuple<
 // nest++
     ParentId<Id>, BeforeId<Id>, ToStorage<OrderedTree<Id, Node, Leaf>>>;
 // nest--
-
 // nest++
 template<class Id, class Node, class Leaf>
 using TreeUpdate = std::tuple<
 // nest--
 // nest++
     Id, std::variant<ToCommand<Node>, ToCommand<Leaf>>>;
+// nest--
+// nest++
+template<class Id>
+using TreeMove = std::tuple<Id, ParentId<Id>, BeforeId<Id>>;
+// nest--
+// nest++
+template<class Id>
+using TreeDelete = Id;
 // nest--
 
 // nest++
@@ -1131,16 +1137,13 @@ auto toCommand(ADL<OrderedTree<Id, Node, Leaf>>)
 // nest++
     -> std::variant<
       // nest++
-        TreeCreate<Id, Node, Leaf>,                 // Create
+        TreeCreate<Id, Node, Leaf>,
       // nest--
       // nest++
-        TreeUpdate<Id, Node, Leaf>,                 // Update
+        TreeUpdate<Id, Node, Leaf>,
       // nest--
       // nest++
-        std::tuple<Id, ParentId<Id>, BeforeId<Id>>, // Move
-      // nest--
-      // nest++
-        Id>;                                        // Delete
+        TreeMove<Id>, TreeDelete<Id>>;
       // nest--
 // nest--
 // nest--
@@ -1382,6 +1385,59 @@ void compute(const ToStorage<PersonData>& s, Ansprache& o) {
     // nest--
 }
 // nest--
+----
+--
+
+[.source.s90x23]
+== !
+
+[.build]
+--
+[source%nested, cpp]
+----
+void testCompute() {
+    // nest++
+    auto input = EntityCreate<PersonData>{Anrede::Herr, 
+        Vorname{"Bjarne"}, Nachname{"Stroustrup"}};
+    // nest--
+    // nest++
+    auto output = Ansprache{};
+    // nest--
+    // nest++
+    compute::compute(input, output);
+    // nest--
+
+    // nest++
+    using OutPersons = ToComputed<Persons>;
+    // nest--
+    // nest++
+    using OutCommand = ToCommand<OutPersons>;
+    // nest--
+    // nest++
+    using OutCreateCommand = EntityCreate<ToComputed<PersonData>>;
+    // nest--
+    // nest++
+    using OutRepository = ToRepository<OutPersons>;
+    // nest--
+    // nest++
+    constexpr auto processOutCommand = 
+        processor::to_command_processor<OutPersons>;
+    // nest--
+
+    // nest++
+    OutCommand outCmd1 = OutCreateCommand{
+        std::get<Anrede>(input),
+        std::get<Vorname>(input), std::get<Nachname>(input),
+        output
+    };
+    // nest--
+    // nest++
+    OutRepository outRepo;
+    // nest--
+    // nest++
+    processOutCommand(outCmd1, outRepo);
+    // nest--
+}
 ----
 --
 

@@ -34,8 +34,7 @@ template<class Id>
 using EntityDelete = Id;
 
 template<class Id, class Data>
-auto toCommand(ADL<EntitySet<Id, Data>>) -> std::variant<
-    EntityCreate<Data>, EntityUpdate<Id, Data>, EntityDelete<Id>>;
+auto toCommand(ADL<EntitySet<Id, Data>>) -> std::variant<EntityCreate<Data>, EntityUpdate<Id, Data>, EntityDelete<Id>>;
 
 using storage::ParentId;
 template<class Id>

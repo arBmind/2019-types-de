@@ -48,6 +48,7 @@ class EntityRepository {
 
 public:
     auto operator[](Id) -> ToRepository<Data> &;
+    auto operator[](Id) const -> const ToRepository<Data> &;
     void create(const ToStorage<Data> &);
     void remove(Id);
 };
@@ -60,6 +61,10 @@ auto toRepository(ADL<EntitySet<Id, Data>>) //
 // implementation
 template<class Id, class Data>
 auto EntityRepository<Id, Data>::operator[](Id id) -> ToRepository<Data> & {
+    return m[id];
+}
+template<class Id, class Data>
+auto EntityRepository<Id, Data>::operator[](Id id) const -> const ToRepository<Data> & {
     return m[id];
 }
 

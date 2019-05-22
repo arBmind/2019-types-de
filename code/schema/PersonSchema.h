@@ -4,7 +4,10 @@
 
 #include <string>
 
+namespace person {
+
 using std::string;
+using namespace abstract;
 
 // tag::persons[]
 // example usage:
@@ -22,3 +25,5 @@ using Ansprache = Strong<std::string, struct AnspracheTag>;
 
 auto toComputedValues(PersonData) -> AllOf<Ansprache>;
 // end::ansprache[]
+
+} // namespace person
