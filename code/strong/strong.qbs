@@ -26,6 +26,10 @@ Project {
         name: "strong"
         Depends { name: "cpp17" }
         files: [
+            "OpaqueHand.cpp",
+            "OpaqueHand.h",
+            "OpaqueMacro.cpp",
+            "OpaqueMacro.h",
             "Strong.cpp",
             "Strong.h",
         ]
