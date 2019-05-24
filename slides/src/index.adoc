@@ -416,93 +416,6 @@ Für uns reicht erstmal der einfache Strong Type.
 ++++
 
 
-////
-== !
-
-[.cue]
-****
-Vergleiche und Abgrenzungen und ein paar Begriffe
-****
-
-[.subtitle]
-== Data-Oriented Design vs. Typgetrieben
-
-== Wer hat davon gehört / gelesen?
-
-== Wer hat es ausprobiert?
-
-[.cue]
-****
-Danke!
-****
-
-== !
-
-image::MikeActon_Data-Oriented_Design_CcpCon2014.png[role="center", width="1280"]
-
-link:https://www.youtube.com/watch?v=rX0ItVEVjHc[CppCon 2014: Mike Acton "Data-Oriented Design and C++"]
-
-link:https://github.com/dbartolini/data-oriented-design[github.com/dbartolini/data-oriented-design]
-
-[.cue]
-****
-Mike Acton, Engine Director vor Insomniac Games hat das Thema auf der CppCon 2014 eindrucksvoll vorgeführt.
-
-Seitdem gab es eine Menge Vorträge.
-Data-Oriented Design ist eine Optimierung für die Caches der CPU.
-
-Typgetriebene Entwicklung ist Modellierung.
-Wir können und wollen damit sehr gut Daten orientiert arbeiten.
-****
-
-== Objektorientiert vs. Datenorientiert
-
-[%build.compare]
-* [.left]##Entity (== Klasse)##
-  [.right]##Daten (== Strukturen)##
-* [.left]##Memberfunktionen##
-  [.right]##Freie Funktionen##
-* [.left]##Monolith##
-  [.right]##Microservices##
-
-[.cue]
-****
-Es gibt sicher komplexe wissenschaftliche Abhandlungen
-
-Meine diletantische Zusammenfassung hier:
-
-* Der Fokus auf Klassen vs. Strukturen
-
-Services die mit Daten-Protokollen verbunden sind.
-
-Anders die Herausforderung:
-****
-
-////
-
-////
-== Herausforderungen
-
-[%build]
-* Protokolle (Daten)
-* Services (Berechnung)
-* Repository (Datenhaltung)
-* Gui (Modelle)
-
-[.cue]
-****
-* Datenaustausch zwischen
-* Freien Funktionen (Services)
-* Die Berechnen / Vereinen / Transformieren
-* Irgendwie speichern wir was notwendig ist
-
-* Alles muss zueinander passen
-* Da liegt ein Schema dahinter
-
-Das nennen wir hier:
-****
-////
-
 [.subtitle]
 == Datenschema
 
@@ -542,100 +455,6 @@ Bevor wir losessen, brauchen wir noch Motivation.
 Nicht wirklich ein Anwendungsbeispiel, sondern eine ganze Klasse:
 ****
 
-////
-== Komplexität
-
-[.subtitle]
-== Baum
-
-== !
-
-image::Baum.jpg[role="center", width="1920"]
-
-[.cue]
-****
-Ich hab so ein Ding vorm Fenster stehen.
-****
-
-== !
-
-image::Bäume.jpg[role="center", width="1920"]
-
-[.cue]
-****
-Aber die gibts in Massen.
-
-Nicht nur im Wald…
-****
-
-== Bäume überall
-
-[%build]
-* Dateisystem
-* GUI / Scenegraph / HTML
-* Parse-Tree (AST)
-* [language-cpp]#`std::map`#
-* …
-
-[.cue]
-****
-* Wir ordnen alles in Bäumen
-* Alle GUIs sind Bäume (2D, 3D, HTML)
-* Selbst wenn Ich keinen Baum programmiert - Der Compiler
-* Für Optimierungen in der STL
-
-Trotzdem dun wir so als ob die Erde ein Scheibe wäre.
-****
-
-== Adhoc-Bäume
-
-[%build]
-* kein Tree in STL (trotz <filesystem>)
-* QObject
-* Boost: PropertyTree, Graph, …
-* Expression Templates
-* => [.red]##Zu viele Varianten##
-
-
-[.cue]
-****
-… warum ist das so?
-****
-
-== Anpassungen
-
-[%build]
-* Management der Invarianten
-* Speicherung (Knoten, Blätter, Kanten)
-* Teilbäume erlaubt
-* schnelle Iterationen
-* erlaubte Änderungen
-
-[.cue]
-****
-Invarianten:
-
-* keine doppelten IDs
-* Nur bestimmte Knoten auf Ebenen
-* Tiefenlimit
-
-Speicherung
-
-* Sortierung (automatisch/vom Nutzer)
-****
-
-== Kombinatorische Explosion
-
-[.canvas]
-image::mortonus_explosion.jpg[]
-
-[.cue]
-****
-Wie lösen wir das?
-
-* Auf Umwegen - mit Schemas
-****
-////
 
 [.subtitle]
 == Schema mit C++
@@ -1631,7 +1450,6 @@ image::rebuild_logo.png[role="pull-left", width="450"]
 
 [.small]
 * link:https://www.flickr.com/photos/purpleseadonkey/4775066884[Explosion] link:https://creativecommons.org/licenses/by/2.0/[(cc-by-license)]
-* link:https://www.flickr.com/photos/stormfarm/14704893215[Grand Valley cattle drive] link:https://creativecommons.org/licenses/by-sa/2.0/[(cc-by-sa-license)] - Cropped & Auto Toning
 
 [.subtitle]
 == Danke!
