@@ -58,12 +58,13 @@ Es kommt darauf an, wen man fragt.
 == Was ist ein Typ?: …für den Compiler
 
 [%build]
-* Separierung
+* Aggregate
 * Anzahl Bytes
 * Lifecycle
 
 [.cue]
 ****
+* Klassen, Arrays, … (Speicherlayout)
 * Schutz vor Fehlinterpretation
 ****
 
@@ -190,6 +191,7 @@ Für uns reicht erstmal der einfache Strong Type.
 
 [%build]
 * verteiltes System
+* (vereinfacht)
 
 == !
 
@@ -699,6 +701,9 @@ Ok, jetzt können wir die benutzen.
 enum class Anrede { Neutral, Herr, Frau };
 // nest--
 // nest++
+using PersonId = Strong<int, struct PersonIdTag>;
+// nest--
+// nest++
 using Vorname = Strong<string, struct VornameTag>;
 // nest--
 // nest++
@@ -708,9 +713,6 @@ using Nachname = Strong<string, struct NachnameTag>;
 using PersonData = AllOf<Anrede, Vorname, Nachname>;
 // nest--
 
-// nest++
-using PersonId = Strong<int, struct PersonIdTag>;
-// nest--
 // nest++
 using Persons = EntitySet<PersonId, PersonData>;
 // nest--
@@ -787,6 +789,9 @@ image::grandValleyCattleDrive.jpg[]
 
 
 == Einfache Speicherung
+
+[.build]
+* [language-cpp]#`ToStorage<T>`#
 
 [.cue]
 ****
@@ -878,6 +883,15 @@ template<class T>
 using ToStorage = decltype(toStorage(ADL<T>{}));
 // nest--
 
+// nest++
+template<class... Ts>
+auto toStorage(ADL<AllOf<Ts...>>)
+    -> std::tuple<ToStorage<Ts>...>;
+// nest--
+
+// nest++
+// …
+// nest--
 } // namespace storage
 // nest--
 ----
@@ -900,13 +914,9 @@ Jetzt brauchen wir nur die Funktion weiter zu spezialisieren.
 --
 [source%nested, cpp]
 ----
-// nest++
 template<class... Ts>
 auto toStorage(ADL<AllOf<Ts...>>)
-// nest++
     -> std::tuple<ToStorage<Ts>...>;
-// nest--
-// nest--
 
 // nest++
 template<class... Ts>
@@ -1043,6 +1053,10 @@ Einfach oder?
 
 == Befehle
 
+[.build]
+* [.green]#✔# [language-cpp]#`ToStorage<T>`#
+* [language-cpp]#`ToCommand<T>`#
+
 [.cue]
 ****
 Nachdem das für Storage so gut funktioniert, machen wir das für Befehle auch.
@@ -1164,6 +1178,11 @@ Wie Ihr seht kann man immer lokal arbeiten.
 
 == Repository
 
+[.build]
+* [.green]#✔# [language-cpp]#`ToStorage<T>`#
+* [.green]#✔# [language-cpp]#`ToCommand<T>`#
+* [language-cpp]#`ToRepository<T>`#
+
 [.cue]
 ****
 Den gleichen Pattern können wir nun auch nutzen um Repositories aus dem Schema abzuleiten.
@@ -1230,6 +1249,12 @@ So, sehen wir direkt welche Operationen angedacht sind.
 ****
 
 == Befehlsverarbeitung
+
+[.build]
+* [.green]#✔# [language-cpp]#`ToStorage<T>`#
+* [.green]#✔# [language-cpp]#`ToCommand<T>`#
+* [.green]#✔# [language-cpp]#`ToRepository<T>`#
+* [language-cpp]#`to_command_processor<T>`#
 
 [.cue]
 ****
